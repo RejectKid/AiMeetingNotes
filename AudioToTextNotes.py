@@ -5,6 +5,7 @@ import queue
 import threading
 import time
 from transformers import pipeline
+from datetime import datetime
 
 # Load Whisper model on CPU
 model = whisper.load_model("base")  # or "medium" for better accuracy
@@ -23,6 +24,10 @@ CHUNK_SIZE = int(SAMPLE_RATE * BLOCK_DURATION)
 
 audio_queue = queue.Queue()
 
+# Function to get the current time stamp
+def get_current_timestamp():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 def audio_callback(indata, frames, time_info, status):
     audio_queue.put(indata.copy())
 
@@ -33,12 +38,14 @@ def record_audio():
             time.sleep(1)
 
 def save_raw_transcript(text: str):
+    timestamp = get_current_timestamp()
     with open("raw_transcripts.txt", "a", encoding="utf-8") as f:
-        f.write(text.strip() + "\n\n")
+        f.write(f"{timestamp} - {text.strip()}\n\n")
 
 def save_summary_to_file(summary: str):
+    timestamp = get_current_timestamp()
     with open("notes.txt", "a", encoding="utf-8") as f:
-        f.write(summary.strip() + "\n\n")
+        f.write(f"{timestamp} - {summary.strip()}\n\n")
 
 def transcribe_and_summarize():
     buffer = []
