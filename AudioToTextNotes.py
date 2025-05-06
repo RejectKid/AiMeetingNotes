@@ -6,6 +6,8 @@ import threading
 import time
 from transformers import pipeline
 from datetime import datetime
+from pyAudioAnalysis import audioSegmentation as aS
+import soundfile as sf
 
 # Load Whisper model on CPU
 model = whisper.load_model("base")  # or "medium" for better accuracy
@@ -19,7 +21,7 @@ summarizer = pipeline(
 
 # Audio settings
 SAMPLE_RATE = 16000
-BLOCK_DURATION = 150  # x seconds
+BLOCK_DURATION = 15  # x seconds
 CHUNK_SIZE = int(SAMPLE_RATE * BLOCK_DURATION)
 
 audio_queue = queue.Queue()
@@ -47,6 +49,12 @@ def save_summary_to_file(summary: str):
     with open("notes.txt", "a", encoding="utf-8") as f:
         f.write(f"{timestamp} - {summary.strip()}\n\n")
 
+def perform_diarization(audio_file):
+    # Perform speaker diarization
+    print("Performing speaker diarization...")
+    diarization_result = aS.speaker_diarization(audio_file, n_speakers=2)  # Adjust number of speakers if needed
+    return diarization_result
+
 def transcribe_and_summarize():
     buffer = []
     while True:
@@ -66,6 +74,16 @@ def transcribe_and_summarize():
                 if len(transcription) > 20:
                     print("📄 Transcript:", transcription[:200] + "..." if len(transcription) > 200 else transcription)
                     save_raw_transcript(transcription)
+
+                    # Save audio file temporarily for diarization
+                    temp_audio_file = "temp_audio.wav"
+                    sf.write(temp_audio_file, audio_chunk, SAMPLE_RATE)
+
+                    # Perform speaker diarization
+                    diarization_result = perform_diarization(temp_audio_file)
+
+                    # Optionally, process the diarization_result to label speakers and transcribe
+                    print("Diarization Result:", diarization_result)
 
                     print("✍️ Summarizing...")
                     summary = summarizer(

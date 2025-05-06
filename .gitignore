@@ -55,3 +55,4 @@ docker-compose.yml
 # Notes and Transcripts (Do not commit these files)
 notes.txt
 raw_transcripts.txt
+*.wav
