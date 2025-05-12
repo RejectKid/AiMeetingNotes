@@ -1,7 +1,3 @@
-Certainly! Here's a comprehensive `README.md` tailored for your [AiMeetingNotes](https://github.com/RejectKid/AiMeetingNotes) repository:
-
----
-
 # AiMeetingNotes
 
 🎙️ **AiMeetingNotes** is a Python-based tool designed to record meetings, transcribe audio, and generate concise summaries. It captures audio in 2.5-minute intervals, transcribes the content using OpenAI's Whisper model, and summarizes the transcriptions with Facebook's BART model.
